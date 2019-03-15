@@ -1,6 +1,6 @@
 close all; clear; clc;
 
-%% Create a 2D Environment
+%% Create a 2D Environment (with Red and Green grids)
 
 M = 5;
 N = 5;
@@ -23,35 +23,44 @@ imagesc(Map);
 
 P = ones(M,N)/(M*N);
 
-%% Sense
+%% Localization of Robot (By Repeated Sense and Move)
 
-Z = {'red','red'};
+Z = {'red','red','red';
+     'green','green','red';
+     'green','red','red';
+     'green','green','red';
+     'red','red','green'};
 
-Q = sense2D(P, Z, World);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-figure;
-colormap(gray);
-imagesc(Q);
+% Here I considered that multiple sensor readings are fed to the Sense
+% Algorithm. For instance 3 Sensors connected to the Robot senses the
+% Grid simultaneously and the Posterior Probability of one sensor is fed to
+% the next. The output of this function is the Posterior Probability of the
+% last sensor. Each row of 'Z' represents the three sensors readings.
 
-%% Move
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%U = 0; V = 0; % No Motion
-U = 0; V = 1; % Right
-%U = 0; V = -1; % Left
-%U = 1; V = 0; % Up
-%U = -1; V = 0; % Down
+U = [0 1 -1 0 0];
+V = [-1 0 0 1 0];
 
-Q_Move = move2D(Q, U, V);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-figure;
-colormap(gray);
-imagesc(Q_Move);
+% Motion of the Robot in the Environment can be represented as follows.
 
-%% Sense
+%   U = 0; V = 0; % No Motion
+%   U = 0; V = 1; % Right
+%   U = 0; V = -1; % Left
+%   U = 1; V = 0; % Up
+%   U = -1; V = 0; % Down
 
-Z = {'red','red'};
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Q_New = sense2D(Q_Move, Z, World);
+for i = 1:size(Z,1)
+    Q = sense2D(P, Z(i), World);
+    Q_New = move2D(Q, U(i), V(i));
+    P = Q_New;
+end
 
 figure;
 colormap(gray);
