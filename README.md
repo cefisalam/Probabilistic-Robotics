@@ -1,2 +1,2 @@
 # Probabilistic-Robotics
-Basic Practical Works on Probabilistic Robotics
+Basic Lab Works on Probabilistic Robotics
